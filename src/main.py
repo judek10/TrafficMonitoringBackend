@@ -9,16 +9,19 @@ myCollection = myDataBase["aisdk_20201118"]
 class TrafficMonitoringBackEnd:
 
     def insert_ais(ais_data):
-        json_object = json.dumps(ais_data)
-        with open("sample.json", "w") as outfile:
-            outfile.write(json_object)
+        i = 0
 
-        with open("sample.json") as file:
+        with open(ais_data) as file:
             file_data = json.load(file)
 
-        myCollection.insert_one(file_data)
+        if isinstance(file_data, list):
+            myCollection.insert_many(file_data)
+            i += len(list(file_data))
+        else:
+            myCollection.insert_one(file_data)
+            i = 1
 
-        return print("Number of Insertions: ")
+        return print("Number of Insertions: " + str(i))
 
 
 def main():

@@ -1,5 +1,6 @@
 import pymongo
 import json
+from datetime import datetime, timedelta
 
 myClient = pymongo.MongoClient("mongodb://localhost:27017")
 myDataBase = myClient["AISTestData"]
@@ -21,7 +22,17 @@ class TrafficMonitoringBackEnd:
             myCollection.insert_one(file_data)
             i = 1
 
-        return print("Number of Insertions: " + str(i))
+        return "Number of Insertions: " + str(i)
+
+    def delete_ais_by_timestamp(current_time):
+        date_format = "%Y-%m-%d %H:%M:%S.%f"
+        given_time = datetime.strptime(current_time, date_format)
+
+        subtracted_current_time = given_time - timedelta(minutes=5)
+        subtracted_current_time = subtracted_current_time.isoformat()[:-3] + 'Z'
+
+        return "Number of Deletions: " + str(
+            myCollection.delete_many({"Timestamp": {"$lt": subtracted_current_time}}).deleted_count)
 
 
 def main():

@@ -6,10 +6,8 @@ myClient = pymongo.MongoClient("mongodb://localhost:27017")
 myDataBase = myClient["AISTestData"]
 myCollection = myDataBase["aisdk_20201118"]
 
-test_ais = {"Timestamp": "2020-11-18T00:00:00.000Z", "Class": "Class A", "MMSI": 210169000, "MsgType": "static_data",
-            "IMO": 9584865, "CallSign": "5BNZ3", "Name": "KATHARINA SCHEPERS", "VesselType": "Cargo",
-            "CargoTye": "Category X", "Length": 152, "Breadth": 24, "Draught": 7.8, "Destination": "NODRM",
-            "ETA": "2020-11-18T09:00:00.000Z", "A": 143, "B": 9, "C": 13, "D": 11}
+test_timestamp_one = "1999-11-18 13:21:26.368387"
+test_timestamp_two = "2022-12-02 13:21:26.368387"
 
 
 class TestStringMethods(unittest.TestCase):
@@ -28,7 +26,13 @@ class TestStringMethods(unittest.TestCase):
         with self.assertRaises(TypeError):
             s.split(2)
 
-    def test_insert_ais(self):
-        x = main.TrafficMonitoringBackEnd
-        x.insert_ais(test_ais)
-        self.assertTrue(myCollection.find({"IMO": 9584865}))
+    def test_ais_insertion(self):
+        tmb = main.TrafficMonitoringBackEnd
+        result = tmb.insert_ais("AISMessages.json")
+        self.assertEqual("Number of Insertions: 3", result)
+
+    def test_ais_deletion(self):
+        tmb = main.TrafficMonitoringBackEnd
+        tmb.insert_ais("AISMessages_2.json")
+        result = tmb.delete_ais_by_timestamp(test_timestamp_one)
+        self.assertEqual("Number of Deletions: 3", result)

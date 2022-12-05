@@ -1,5 +1,4 @@
-import datetime
-
+import pprint
 import pymongo
 import json
 from datetime import datetime, timedelta
@@ -7,6 +6,7 @@ from datetime import datetime, timedelta
 myClient = pymongo.MongoClient("mongodb://localhost:27017")
 myDataBase = myClient["AISTestData"]
 myCollection = myDataBase["aisdk_20201118"]
+myPorts = myDataBase["ports"]
 
 
 class TrafficMonitoringBackEnd:
@@ -37,13 +37,26 @@ class TrafficMonitoringBackEnd:
             myCollection.delete_many({"Timestamp": {"$lt": subtracted_current_time}}).deleted_count)
 
     def get_recent_vessel_positions(self):
-        vessel_positions = myCollection.find({}, {"_id": 0, "MMSI": 1, "Position.coordinates": 1})\
+        vessel_positions = myCollection.find({}, {"_id": 0, "MMSI": 1, "Position.coordinates": 1}) \
             .sort('Timestamp', pymongo.DESCENDING).limit(3)
         return vessel_positions
 
     def get_recent_vessel_position_mmsi(mmsi):
-        return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id":0, "MMSI": 1, "Position.coordinates": 1})\
+        return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 1, "Position.coordinates": 1}) \
             .sort('Timestamp', pymongo.DESCENDING).limit(1)
+
+    def find_all_ports(port_id, country=None):
+        array_of_ports = []
+
+        if country is not None:
+            ports = myPorts.find({"port_location": port_id, "country": country})
+            for doc in ports:
+                array_of_ports.append(doc)
+        else:
+            ports = myPorts.find({"port_location": port_id})
+            for doc in ports:
+                array_of_ports.append(doc)
+        return pprint.pprint(array_of_ports)
 
 
 def main():

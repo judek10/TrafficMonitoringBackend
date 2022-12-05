@@ -1,3 +1,5 @@
+import datetime
+
 import pymongo
 import json
 from datetime import datetime, timedelta
@@ -33,6 +35,15 @@ class TrafficMonitoringBackEnd:
 
         return "Number of Deletions: " + str(
             myCollection.delete_many({"Timestamp": {"$lt": subtracted_current_time}}).deleted_count)
+
+    def get_recent_vessel_positions(self):
+        vessel_positions = myCollection.find({}, {"_id": 0, "MMSI": 1, "Position.coordinates": 1})\
+            .sort('Timestamp', pymongo.DESCENDING).limit(3)
+        return vessel_positions
+
+    def get_recent_vessel_position_mmsi(mmsi):
+        return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id":0, "MMSI": 1, "Position.coordinates": 1})\
+            .sort('Timestamp', pymongo.DESCENDING).limit(1)
 
 
 def main():

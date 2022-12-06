@@ -23,6 +23,11 @@ test_recent_postions = [
     {"Timestamp": "2020-11-18T00:00:10.000Z", "Class": "Class A", "MMSI": 219018405, "MsgType": "position_report",
      "Position": {"type": "Point", "coordinates": [57.71615, 10.586342]}, "Status": "Engaged in fishing", "RoT": 0}]
 
+test_ais = {"Timestamp": "2020-11-18T00:02:00.000Z", "Class": "Class A", "MMSI": 244265000,
+            "MsgType": "position_report",
+            "Position": {"type": "Point", "coordinates": [55.522592, 15.068637]}, "Status": "Under way using engine",
+            "RoT": 2.2, "SoG": 14.8, "CoG": 62, "Heading": 61}
+
 
 class TestStringMethods(unittest.TestCase):
 
@@ -40,16 +45,35 @@ class TestStringMethods(unittest.TestCase):
         with self.assertRaises(TypeError):
             s.split(2)
 
-    def test_ais_insertion(self):
+    def test_batch_of_ais_insertion(self):
         tmb = main.TrafficMonitoringBackEnd
-        result = tmb.insert_ais("AISMessages.json")
+        result = tmb.insert_batch_of_ais("AISMessages.json")
         self.assertEqual("Number of Insertions: 3", result)
+
+    def test_single_ais_insertion(self):
+        tmb = main.TrafficMonitoringBackEnd
+        result = tmb.insert_single_ais(test_ais)
+        self.assertEqual("Success: 1", result)
 
     def test_ais_deletion(self):
         tmb = main.TrafficMonitoringBackEnd
-        tmb.insert_ais("AISMessages_2.json")
+        tmb.insert_batch_of_ais("AISMessages_2.json")
         result = tmb.delete_ais_by_timestamp(test_timestamp_one)
         self.assertEqual("Number of Deletions: 3", result)
+
+    def test_find_ports_with_name(self):
+        tmb = main.TrafficMonitoringBackEnd
+        result = tmb.find_all_ports("Falkenberg")
+        self.assertEqual([{'country': 'Sweden', 'id': '446', 'latitude': '56.889444', 'longitude': '12.481944',
+                           'mapview_1': 1, 'mapview_2': 5530, 'mapview_3': 55301, 'port_location': 'Falkenberg',
+                           'un/locode': 'SEFAG', 'website': 'www.falkenbergs-terminal.se'}], result)
+
+    def test_find_ports_with_name_and_country(self):
+        tmb = main.TrafficMonitoringBackEnd
+        result = tmb.find_all_ports("Struer", "Denmark")
+        self.assertEqual([{'country': 'Denmark', 'id': '2977', 'latitude': '56.494167', 'longitude': '8.595556',
+                           'mapview_1': 1, 'mapview_2': 5137, 'mapview_3': 51372, 'port_location': 'Struer',
+                           'un/locode': 'DKSTR', 'website': 'www.struerhavn.dk'}], result)
 
     def test_get_recent_vessel_positions(self):
         x = main.TrafficMonitoringBackEnd()

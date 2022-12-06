@@ -11,20 +11,23 @@ myPorts = myDataBase["ports"]
 
 class TrafficMonitoringBackEnd:
 
-    def insert_ais(ais_data):
+    def insert_batch_of_ais(ais_data):
         i = 0
 
         with open(ais_data) as file:
             file_data = json.load(file)
 
-        if isinstance(file_data, list):
-            myCollection.insert_many(file_data)
-            i += len(list(file_data))
-        else:
-            myCollection.insert_one(file_data)
-            i = 1
+        myCollection.insert_many(file_data)
+        i += len(list(file_data))
 
         return "Number of Insertions: " + str(i)
+
+    def insert_single_ais(ais_data):
+        try:
+            myCollection.insert_one(ais_data)
+            return "Success: 1"
+        except:
+            return "Failure: 0"
 
     def delete_ais_by_timestamp(current_time):
         date_format = "%Y-%m-%d %H:%M:%S.%f"
@@ -45,18 +48,18 @@ class TrafficMonitoringBackEnd:
         return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 1, "Position.coordinates": 1}) \
             .sort('Timestamp', pymongo.DESCENDING).limit(1)
 
-    def find_all_ports(port_id, country=None):
+    def find_all_ports(port_name, country=None):
         array_of_ports = []
 
         if country is not None:
-            ports = myPorts.find({"port_location": port_id, "country": country})
+            ports = myPorts.find({"port_location": port_name, "country": country}, {"_id": 0})
             for doc in ports:
                 array_of_ports.append(doc)
         else:
-            ports = myPorts.find({"port_location": port_id})
+            ports = myPorts.find({"port_location": port_name}, {"_id": 0})
             for doc in ports:
                 array_of_ports.append(doc)
-        return pprint.pprint(array_of_ports)
+        return array_of_ports
 
 
 def main():

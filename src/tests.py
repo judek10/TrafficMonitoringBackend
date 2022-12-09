@@ -94,3 +94,22 @@ class TestStringMethods(unittest.TestCase):
             positions.append(position)
         position = positions[0]
         self.assertEqual({'MMSI': 235090202, 'Position': {'coordinates': [54.646827, 11.355255]}}, position)
+
+    def test_get_permanent_vessel_information_all_attributes(self):
+        x = main.TrafficMonitoringBackEnd
+        vessels = x.get_permanent_vessel_information(mmsi=235095435, imo=1000019, name="Lady K Ii")
+        self.assertEqual({'IMO': 1000019, 'Name': 'Lady K Ii', 'MMSI': 235095435}, vessels[0])
+
+    def test_get_permanent_vessel_information_imo_mmsi(self):
+        x = main.TrafficMonitoringBackEnd
+        vessels = x.get_permanent_vessel_information(mmsi=235095435, imo=1000019)
+        self.assertEqual({'IMO': 1000019, 'Name': 'Lady K Ii', 'MMSI': 235095435}, vessels[0])
+
+    def test_get_permanent_vessel_information_name_mmsi(self):
+        x = main.TrafficMonitoringBackEnd
+        vessels = x.get_permanent_vessel_information(mmsi=235095435, name="Lady K Ii")
+        self.assertEqual({'IMO': 1000019, 'Name': 'Lady K Ii', 'MMSI': 235095435}, vessels[0])
+
+
+
+

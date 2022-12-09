@@ -7,6 +7,7 @@ myClient = pymongo.MongoClient("mongodb://localhost:27017")
 myDataBase = myClient["AISTestData"]
 myCollection = myDataBase["aisdk_20201118"]
 myPorts = myDataBase["ports"]
+vessels = myDataBase["vessels"]
 
 
 class TrafficMonitoringBackEnd:
@@ -61,9 +62,26 @@ class TrafficMonitoringBackEnd:
                 array_of_ports.append(doc)
         return array_of_ports
 
+    def get_permanent_vessel_information(mmsi, imo=None, name=None):
+        if imo or name is not None:
+            if imo is None:
+                return vessels.find({"MMSI": {"$eq": mmsi}, "Name": {"$eq": name}},
+                                    {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
+            elif name is None:
+                return vessels.find({"MMSI": {"$eq": mmsi}, "IMO": {"$eq": imo}},
+                                    {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
+            else:
+                return vessels.find({"MMSI": {"$eq": mmsi}, "IMO": {"$eq": imo}, "Name": {"$eq": name}},
+                                    {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
+        else:
+            return vessels.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
+
 
 def main():
-    print("hello world")
+    x = TrafficMonitoringBackEnd
+    vesselList = x.get_permanent_vessel_information(mmsi=235095435, imo=1000019, name="Lady K Ii")
+    for i in vesselList:
+        print(i)
 
 
 if __name__ == '__main__':

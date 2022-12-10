@@ -1,5 +1,4 @@
 import base64
-import pprint
 import pymongo
 import json
 from datetime import datetime, timedelta
@@ -15,15 +14,15 @@ vessels = myDataBase["vessels"]
 class TrafficMonitoringBackEnd:
 
     def insert_batch_of_ais(ais_data):
-        i = 0
+        insertion_number = 0
 
         with open(ais_data) as file:
             file_data = json.load(file)
 
         myCollection.insert_many(file_data)
-        i += len(list(file_data))
+        insertion_number += len(list(file_data))
 
-        return "Number of Insertions: " + str(i)
+        return "Number of Insertions: " + str(insertion_number)
 
     def insert_single_ais(ais_data):
         try:
@@ -52,17 +51,17 @@ class TrafficMonitoringBackEnd:
             .sort('Timestamp', pymongo.DESCENDING).limit(1)
 
     def find_all_ports(port_name, country=None):
-        array_of_ports = []
+        ports_list = []
 
         if country is not None:
-            ports = myPorts.find({"port_location": port_name, "country": country}, {"_id": 0})
-            for doc in ports:
-                array_of_ports.append(doc)
+            port = myPorts.find({"port_location": port_name, "country": country}, {"_id": 0})
+            for doc in port:
+                ports_list.append(doc)
         else:
-            ports = myPorts.find({"port_location": port_name}, {"_id": 0})
-            for doc in ports:
-                array_of_ports.append(doc)
-        return array_of_ports
+            port = myPorts.find({"port_location": port_name}, {"_id": 0})
+            for doc in port:
+                ports_list.append(doc)
+        return ports_list
 
     def get_permanent_vessel_information(mmsi, imo=None, name=None):
         if imo or name is not None:
@@ -77,26 +76,28 @@ class TrafficMonitoringBackEnd:
                                     {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
         else:
             return vessels.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
+
     def read_all_ship_positions(port_name, country):
         tile_id = myPorts.find({"port_location": port_name, "country": country}, {"mapview_3": 1, "_id": 0})
-        list_of_tile_id = [document["mapview_3"] for document in tile_id]
-        mapview_tile = list(myMapViews.find({"id": list_of_tile_id.pop()}, {"west": 1, "south": 1, "east": 1, "north": 1, "_id": 0}))
+        tile_id_list = [document["mapview_3"] for document in tile_id]
+        mapview_tile = list(
+            myMapViews.find({"id": tile_id_list.pop()}, {"west": 1, "south": 1, "east": 1, "north": 1, "_id": 0}))
 
-        list_of_tile_boundries = []
+        cardinal_directions = []
         for doc in mapview_tile:
-            list_of_tile_boundries.append(doc)
+            cardinal_directions.append(doc)
 
-        ship_positions = myCollection.find({"Position.coordinates.0": {"$gte": list_of_tile_boundries[0]["south"],
-                                                                       "$lte": list_of_tile_boundries[0]["north"]},
-                                            "Position.coordinates.1": {"$gte": list_of_tile_boundries[0]["west"],
-                                                                       "$lte": list_of_tile_boundries[0]["east"]}},
+        ship_positions = myCollection.find({"Position.coordinates.0": {"$gte": cardinal_directions[0]["south"],
+                                                                       "$lte": cardinal_directions[0]["north"]},
+                                            "Position.coordinates.1": {"$gte": cardinal_directions[0]["west"],
+                                                                       "$lte": cardinal_directions[0]["east"]}},
                                            {"Position.coordinates": 1, "_id": 0})
 
-        list_of_ship_positions = []
+        ship_positions_list = []
         for doc in ship_positions:
-            list_of_ship_positions.append(doc)
+            ship_positions_list.append(doc)
 
-        return list_of_ship_positions
+        return ship_positions_list
 
     def get_tile_png(mapview_id):
         x = myMapViews.find({"id": mapview_id})

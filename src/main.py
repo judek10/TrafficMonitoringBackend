@@ -1,3 +1,4 @@
+import base64
 import pprint
 import pymongo
 import json
@@ -7,6 +8,7 @@ myClient = pymongo.MongoClient("mongodb://localhost:27017")
 myDataBase = myClient["AISTestData"]
 myCollection = myDataBase["aisdk_20201118"]
 myPorts = myDataBase["ports"]
+myMapViews = myDataBase["mapviews"]
 vessels = myDataBase["vessels"]
 
 
@@ -75,6 +77,34 @@ class TrafficMonitoringBackEnd:
                                     {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
         else:
             return vessels.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
+    def read_all_ship_positions(port_name, country):
+        tile_id = myPorts.find({"port_location": port_name, "country": country}, {"mapview_3": 1, "_id": 0})
+        list_of_tile_id = [document["mapview_3"] for document in tile_id]
+        mapview_tile = list(myMapViews.find({"id": list_of_tile_id.pop()}, {"west": 1, "south": 1, "east": 1, "north": 1, "_id": 0}))
+
+        list_of_tile_boundries = []
+        for doc in mapview_tile:
+            list_of_tile_boundries.append(doc)
+
+        ship_positions = myCollection.find({"Position.coordinates.0": {"$gte": list_of_tile_boundries[0]["south"],
+                                                                       "$lte": list_of_tile_boundries[0]["north"]},
+                                            "Position.coordinates.1": {"$gte": list_of_tile_boundries[0]["west"],
+                                                                       "$lte": list_of_tile_boundries[0]["east"]}},
+                                           {"Position.coordinates": 1, "_id": 0})
+
+        list_of_ship_positions = []
+        for doc in ship_positions:
+            list_of_ship_positions.append(doc)
+
+        return list_of_ship_positions
+
+    def get_tile_png(mapview_id):
+        x = myMapViews.find({"id": mapview_id})
+        y = [document["filename"] for document in x]
+        with open(y, "rb") as f:
+            png_encoded = base64.b64encode(f.read())
+            encoded_b2 = "".join([format(n, '08b') for n in png_encoded])
+        print(encoded_b2)
 
 
 def main():

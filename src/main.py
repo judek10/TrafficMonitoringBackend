@@ -107,12 +107,22 @@ class TrafficMonitoringBackEnd:
             encoded_b2 = "".join([format(n, '08b') for n in png_encoded])
         print(encoded_b2)
 
+    def get_recent_vessel_position_tile(tileId):
+        map_view_coordinates = myMapViews.find({"id": tileId}, {"_id": 0, "west": 1, "east": 1, "north": 1, "south": 1})
+        ship_positions = myCollection.find({"Position.coordinates.0": {"$gte": map_view_coordinates[0]["south"],
+                                                                       "$lte": map_view_coordinates[0]["north"]},
+                                            "Position.coordinates.1": {"$gte": map_view_coordinates[0]["west"],
+                                                                       "$lte": map_view_coordinates[0]["east"]}},
+                                           {"_id": 0, "Position.coordinates": 1, "MMSI": 1, "Name": 1, "IMO": 1})
+        return ship_positions
+
 
 def main():
     x = TrafficMonitoringBackEnd
-    vesselList = x.get_permanent_vessel_information(mmsi=235095435, imo=1000019, name="Lady K Ii")
-    for i in vesselList:
-        print(i)
+    vesselList = x.get_recent_vessel_position_tile(5237)
+    print(vesselList[0])
+    # for i in vesselList:
+    #     print(i)
 
 
 if __name__ == '__main__':

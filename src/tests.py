@@ -110,6 +110,11 @@ class TestStringMethods(unittest.TestCase):
         vessels = x.get_permanent_vessel_information(mmsi=235095435, name="Lady K Ii")
         self.assertEqual({'IMO': 1000019, 'Name': 'Lady K Ii', 'MMSI': 235095435}, vessels[0])
 
+    def test_get_recent_vessel_position_tile(self):
+        x = main.TrafficMonitoringBackEnd
+        vessel_positions = x.get_recent_vessel_position_tile(5237)
+        self.assertEqual({'MMSI': 255805899, 'Position': {'coordinates': [57.478323, 9.329788]}}, vessel_positions[0])
+
 
 
 

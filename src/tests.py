@@ -8,6 +8,7 @@ myCollection = myDataBase["aisdk_20201118"]
 
 test_timestamp_one = "1999-11-18 13:21:26.368387"
 test_timestamp_two = "2022-12-02 13:21:26.368387"
+test_timestamp_three = "1903-12-02 13:21:26.368387"
 
 test_recent_postions = [
     {"Timestamp": "2020-11-18T00:02:00.000Z", "Class": "Class A", "MMSI": 244265000, "MsgType": "position_report",
@@ -28,22 +29,14 @@ test_ais = {"Timestamp": "2020-11-18T00:02:00.000Z", "Class": "Class A", "MMSI":
             "Position": {"type": "Point", "coordinates": [55.522592, 15.068637]}, "Status": "Under way using engine",
             "RoT": 2.2, "SoG": 14.8, "CoG": 62, "Heading": 61}
 
+test_ais_two = {"Timestamp": "1902-11-18T00:02:00.000Z", "Class": "Class A", "MMSI": 244265000,
+                "MsgType": "position_report",
+                "Position": {"type": "Point", "coordinates": [55.522592, 15.068637]},
+                "Status": "Under way using engine",
+                "RoT": 2.2, "SoG": 14.8, "CoG": 62, "Heading": 61}
+
 
 class TestStringMethods(unittest.TestCase):
-
-    def test_upper(self):
-        self.assertEqual('foo'.upper(), 'FOO')
-
-    def test_isupper(self):
-        self.assertTrue('FOO'.isupper())
-        self.assertFalse('Foo'.isupper())
-
-    def test_split(self):
-        s = 'hello world'
-        self.assertEqual(s.split(), ['hello', 'world'])
-        # check that s.split fails when the separator is not a string
-        with self.assertRaises(TypeError):
-            s.split(2)
 
     def test_batch_of_ais_insertion(self):
         tmb = main.TrafficMonitoringBackEnd
@@ -54,6 +47,18 @@ class TestStringMethods(unittest.TestCase):
         tmb = main.TrafficMonitoringBackEnd
         result = tmb.insert_single_ais(test_ais)
         self.assertEqual("Success: 1", result)
+
+    def test_single_ais_insertion_failure(self):
+        tmb = main.TrafficMonitoringBackEnd
+        result = tmb.insert_single_ais("")
+        self.assertEqual("Failure: 0", result)
+
+    def test_insert_batch_and_single(self):
+        tmb = main.TrafficMonitoringBackEnd
+        batch = tmb.insert_batch_of_ais("AISMessages.json")
+        single = tmb.insert_single_ais(test_ais)
+        self.assertEqual("Number of Insertions: 3", batch)
+        self.assertEqual("Success: 1", single)
 
     def test_ais_deletion(self):
         tmb = main.TrafficMonitoringBackEnd
@@ -110,11 +115,24 @@ class TestStringMethods(unittest.TestCase):
         vessels = x.get_permanent_vessel_information(mmsi=235095435, name="Lady K Ii")
         self.assertEqual({'IMO': 1000019, 'Name': 'Lady K Ii', 'MMSI': 235095435}, vessels[0])
 
-    def test_get_recent_vessel_position_tile(self):
+    def test_read_all_ship_positions_with_null_mapview(self):
         x = main.TrafficMonitoringBackEnd
-        vessel_positions = x.get_recent_vessel_position_tile(5237)
-        self.assertEqual({'MMSI': 255805899, 'Position': {'coordinates': [57.478323, 9.329788]}}, vessel_positions[0])
+        ship_positions = x.read_all_ship_positions("Hobro", "Denmark")
+        message = "Test value is not true."
+        self.assertTrue(ship_positions, message)
 
+    def test_read_ship_positions_spelling_mistake(self):
+        x = main.TrafficMonitoringBackEnd
+        ship_positions = x.read_all_ship_positions("Strueer", "Demark")
+        message = "Test value is not true"
+        self.assertTrue(ship_positions, message)
 
+    def test_read_all_ship_positions(self):
+        x = main.TrafficMonitoringBackEnd
+        ship_positions = x.read_all_ship_positions("Struer", "Denmark")
+        self.assertEqual([{'Position': {'coordinates': [56.493048, 8.598582]}}], ship_positions)
 
-
+    def test_read_all_ship_positions_two(self):
+        x = main.TrafficMonitoringBackEnd
+        ship_positions = x.read_all_ship_positions("Flensburg", "Germany")
+        self.assertEqual([{'Position': {'coordinates': [54.814258, 9.454653]}}], ship_positions)

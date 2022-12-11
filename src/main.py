@@ -78,51 +78,52 @@ class TrafficMonitoringBackEnd:
             return vessels.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
 
     def read_all_ship_positions(port_name, country):
-        tile_id = myPorts.find({"port_location": port_name, "country": country}, {"mapview_3": 1, "_id": 0})
-        tile_id_list = [document["mapview_3"] for document in tile_id]
-        mapview_tile = list(
-            myMapViews.find({"id": tile_id_list.pop()}, {"west": 1, "south": 1, "east": 1, "north": 1, "_id": 0}))
+        tile_id = myPorts.find({"port_location": port_name, "country": country}
+                               , {"mapview_3": 1, "_id": 0})
+        tile_id_list = []
+        for doc in tile_id:
+            tile_id_list.append(doc)
 
-        cardinal_directions = []
-        for doc in mapview_tile:
-            cardinal_directions.append(doc)
+        if not tile_id_list or tile_id_list[0]["mapview_3"] is None:
+            port_documents = myPorts.find({}, {"_id": 0, "un/locode": 0, "website": 0})
+            ports_list = []
+            for doc in port_documents:
+                ports_list.append(doc)
+            return ports_list
+        else:
+            mapview_tile = list(
+                myMapViews.find({"id": tile_id_list[0]["mapview_3"]},
+                                {"west": 1, "south": 1, "east": 1, "north": 1, "_id": 0}))
 
-        ship_positions = myCollection.find({"Position.coordinates.0": {"$gte": cardinal_directions[0]["south"],
-                                                                       "$lte": cardinal_directions[0]["north"]},
-                                            "Position.coordinates.1": {"$gte": cardinal_directions[0]["west"],
-                                                                       "$lte": cardinal_directions[0]["east"]}},
-                                           {"Position.coordinates": 1, "_id": 0})
-
-        ship_positions_list = []
-        for doc in ship_positions:
-            ship_positions_list.append(doc)
-
-        return ship_positions_list
+            cardinal_directions = []
+            for doc in mapview_tile:
+                cardinal_directions.append(doc)
+            ship_positions = myCollection.find({"Position.coordinates.0": {"$gte": cardinal_directions[0]["south"],
+                                                                           "$lte": cardinal_directions[0]["north"]},
+                                                "Position.coordinates.1": {"$gte": cardinal_directions[0]["west"],
+                                                                           "$lte": cardinal_directions[0]["east"]}},
+                                               {"Position.coordinates": 1, "_id": 0})
+            ship_positions_list = []
+            for doc in ship_positions:
+                ship_positions_list.append(doc)
+            return ship_positions_list
 
     def get_tile_png(mapview_id):
         x = myMapViews.find({"id": mapview_id})
         y = [document["filename"] for document in x]
-        with open(y, "rb") as f:
+        with open(y.pop(), "rb") as f:
             png_encoded = base64.b64encode(f.read())
             encoded_b2 = "".join([format(n, '08b') for n in png_encoded])
-        print(encoded_b2)
-
-    def get_recent_vessel_position_tile(tileId):
-        map_view_coordinates = myMapViews.find({"id": tileId}, {"_id": 0, "west": 1, "east": 1, "north": 1, "south": 1})
-        ship_positions = myCollection.find({"Position.coordinates.0": {"$gte": map_view_coordinates[0]["south"],
-                                                                       "$lte": map_view_coordinates[0]["north"]},
-                                            "Position.coordinates.1": {"$gte": map_view_coordinates[0]["west"],
-                                                                       "$lte": map_view_coordinates[0]["east"]}},
-                                           {"_id": 0, "Position.coordinates": 1, "MMSI": 1, "Name": 1, "IMO": 1})
-        return ship_positions
+        return encoded_b2
 
 
 def main():
     x = TrafficMonitoringBackEnd
-    vesselList = x.get_recent_vessel_position_tile(5237)
-    print(vesselList[0])
-    # for i in vesselList:
-    #     print(i)
+    vesselList = x.get_permanent_vessel_information(mmsi=235095435, imo=1000019, name="Lady K Ii")
+
+    for i in vesselList:
+        print(i)
+    print(x.get_tile_png(50383))
 
 
 if __name__ == '__main__':

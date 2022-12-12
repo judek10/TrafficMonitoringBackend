@@ -81,7 +81,6 @@ class TestStringMethods(unittest.TestCase):
                            'un/locode': 'DKSTR', 'website': 'www.struerhavn.dk'}], result)
 
     def test_get_recent_vessel_positions(self):
-        # this is correct our ais data must be different, try to add unique ais message
         x = main.TrafficMonitoringBackEnd()
         recent_vessel_positions = x.get_recent_vessel_positions()
         positions = []
@@ -93,8 +92,6 @@ class TestStringMethods(unittest.TestCase):
                          positions)
 
     def test_get_recent_vessel_position_mmsi(self):
-        # this is correct on our ais
-        # try to insert a unique ais message, then search for that ais with mmsi
         x = main.TrafficMonitoringBackEnd
         recent_vessel_position = x.get_recent_vessel_position_mmsi(235090202)
         positions = []

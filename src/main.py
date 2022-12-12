@@ -228,7 +228,7 @@ class TrafficMonitoringBackEnd:
 
     def get_last_five_positions(self):
         last_vessel_positions = myCollection.find({}, {"_id": 0, "MMSI": 5, "Position.coordinates": 5}) \
-            .sort('Timestamp', pymongo.DESCENDING).limit(7)
+            .sort('Timestamp', pymongo.DESCENDING).limit(5)
         return last_vessel_positions
 
     def get_last_five_positions_mmsi(mmsi):

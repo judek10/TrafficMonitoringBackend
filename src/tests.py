@@ -226,4 +226,4 @@ class TestStringMethods(unittest.TestCase):
                          {'MMSI': 219023834, 'Position': {'coordinates': [54.933897, 10.833697]}},
                          {'MMSI': 265750000, 'Position': {'coordinates': [55.557392, 14.357867]}},
                          {'MMSI': 236213000, 'Position': {'coordinates': [57.757052, 10.965845]}},
-                         {'MMSI': 209664000, 'Position': {'coordinates': [54.429803, 11.693033]}}, five_positions)
+                         {'MMSI': 209664000, 'Position': {'coordinates': [54.429803, 11.693033]}}, position)

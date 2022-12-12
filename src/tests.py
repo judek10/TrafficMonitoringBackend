@@ -46,7 +46,10 @@ class TestStringMethods(unittest.TestCase):
     def test_single_ais_insertion(self):
         tmb = main.TrafficMonitoringBackEnd
         result = tmb.insert_single_ais(test_ais)
-        self.assertEqual("Success: 1", result)
+        try:
+            self.assertEqual("Success: 1", result)
+        except:
+            self.assertEqual("Failure: 0", result)
 
     def test_single_ais_insertion_failure(self):
         tmb = main.TrafficMonitoringBackEnd
@@ -130,7 +133,7 @@ class TestStringMethods(unittest.TestCase):
     def test_read_all_ship_positions(self):
         tmb = main.TrafficMonitoringBackEnd
         ship_positions = tmb.read_all_ship_positions("Struer", "Denmark")
-        self.assertEqual([{'Position': {'coordinates': [56.493048, 8.598582]}}], ship_positions)
+        self.assertEqual({'coordinates': [56.493048, 8.598582]}, ship_positions[0]['Position'])
 
     def test_read_all_ship_positions_two(self):
         tmb = main.TrafficMonitoringBackEnd
@@ -140,7 +143,7 @@ class TestStringMethods(unittest.TestCase):
     def test_read_positions_with_port_id(self):
         tmb = main.TrafficMonitoringBackEnd
         port = tmb.read_positions_with_id('2977')
-        self.assertEqual([{'Position': {'coordinates': [56.493048, 8.598582]}}], port[0]['Position'])
+        self.assertEqual({'coordinates': [56.493048, 8.598582]}, port[0]['Position'])
 
     def test_get_png_to_binary(self):
         tmb = main.TrafficMonitoringBackEnd

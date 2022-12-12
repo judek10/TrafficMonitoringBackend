@@ -221,7 +221,7 @@ class TestStringMethods(unittest.TestCase):
         five_positions = []
         for position in last_five_positions:
             five_positions.append(position)
-        position = five_positions[5]
+        position = five_positions[4]
         self.assertEqual({'MMSI': 257385000, 'Position': {'coordinates': [55.219403, 13.127725]}},
                          {'MMSI': 219023834, 'Position': {'coordinates': [54.933897, 10.833697]}},
                          {'MMSI': 265750000, 'Position': {'coordinates': [55.557392, 14.357867]}},

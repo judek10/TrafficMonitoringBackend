@@ -1,4 +1,10 @@
-import base64
+"""A TMB (Traffic Monitoring Backend) that can store AIS data in the mongo database
+
+   Can also perform vendor-specific queries that implement functions such as deletion,
+   insertion, and query searches
+   module authors:: Jude, Ashley, and Gerardo
+"""
+
 import pymongo
 import json
 from datetime import datetime, timedelta
@@ -12,8 +18,17 @@ vessels = myDataBase["vessels"]
 
 
 class TrafficMonitoringBackEnd:
+    """A class that stores the methods for the TMB"""
 
     def insert_batch_of_ais(ais_data):
+        """takes a batch of AIS data (json file) and inserts this data into mongoDB
+
+        param ais_data: file object that stores the to be inserted AIS data
+        :type ais_data: file object
+        :return: the number of documents inserted into the collection
+        :rtype: str
+        """
+
         insertion_number = 0
 
         with open(ais_data) as file:
@@ -25,6 +40,14 @@ class TrafficMonitoringBackEnd:
         return "Number of Insertions: " + str(insertion_number)
 
     def insert_single_ais(ais_data):
+        """inserts a AIS report (static data or position) into the collection.
+
+        param ais_data: a json formatted string that is to be inserted
+        :type ais_data: str
+        :return: 'Success: 1' for successful insertion or 'Failure: 0' for failure
+        :rtype: str
+        """
+
         try:
             myCollection.insert_one(ais_data)
             return "Success: 1"
@@ -32,6 +55,13 @@ class TrafficMonitoringBackEnd:
             return "Failure: 0"
 
     def delete_ais_by_timestamp(current_time):
+        """deletes all AIS messages whose timestamp is 5 min older than current time
+
+        param current_time: current time formatted in UTC ISO
+        :type current_time: str
+        :return: numbers of deletions
+        """
+
         date_format = "%Y-%m-%d %H:%M:%S.%f"
         given_time = datetime.strptime(current_time, date_format)
 
@@ -51,6 +81,20 @@ class TrafficMonitoringBackEnd:
             .sort('Timestamp', pymongo.DESCENDING).limit(1)
 
     def find_all_ports(port_name, country=None):
+        """finds all ports with the given param: port_name and country(optional).
+
+        if no country is given, then a search with find all ports with the given country,
+        then append the documents into a list that is returned.
+        if a country is given in the parameter, the steps from above are done, only
+        difference being is that the search is done with both country and port name.
+        param port_name: port name to be searched
+        :type port_name: str
+        :param country: country of port to be searched
+        :type country: str
+        :return: an array that contains all documents that fit the criteria
+        :rtype: array
+        """
+
         ports_list = []
 
         if country is not None:
@@ -78,6 +122,19 @@ class TrafficMonitoringBackEnd:
             return vessels.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
 
     def read_all_ship_positions(port_name, country):
+        """read all ship positions in the tile of scale 3 containing given port
+
+        takes the port name and country to find port, takes the mapview_3 id
+        to search for tile 3 size, and return all ship positions within
+        that tile.
+        param port_name: the port name of port to be searched
+        :type port_name: str
+        :param country: country of port to be searched
+        :type country: str
+        :return: array of position reports, otherwise, an array or port docs
+        :rtype: array
+        """
+
         tile_id = myPorts.find({"port_location": port_name, "country": country}
                                , {"mapview_3": 1, "_id": 0})
         tile_id_list = []
@@ -118,6 +175,10 @@ class TrafficMonitoringBackEnd:
         return ship_positions
 
     def read_positions_with_id(port_id):
+        """
+
+        :return:
+        """
         tile_id = myPorts.find({"id": port_id}
                                , {"mapview_3": 1, "_id": 0})
         tile_id_list = []
@@ -141,6 +202,15 @@ class TrafficMonitoringBackEnd:
         return ship_positions_list
 
     def get_tile_png(mapview_id):
+        """given a tile id, gets the actual tile data in binary
+
+        searches for mapview tile with id, then converts the png
+        into binary data to return to user
+        :param mapview_id:
+        :type mapview_id:
+        :return: binary data of png file
+        :rtype: str
+        """
         get_filename = myMapViews.find({"id": mapview_id}, {"_id": 0, "filename": 1})\
             .sort('Timestamp', pymongo.DESCENDING)
         filename = []

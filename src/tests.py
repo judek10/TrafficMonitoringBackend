@@ -135,7 +135,7 @@ class TestStringMethods(unittest.TestCase):
     def test_read_all_ship_positions_two(self):
         tmb = main.TrafficMonitoringBackEnd
         ship_positions = tmb.read_all_ship_positions("Flensburg", "Germany")
-        self.assertEqual([{'Position': {'coordinates': [54.814258, 9.454653]}}], ship_positions)
+        self.assertEqual({'coordinates': [54.814258, 9.454653]}, ship_positions[0]['Position'])
 
     def test_read_positions_with_port_id(self):
         tmb = main.TrafficMonitoringBackEnd

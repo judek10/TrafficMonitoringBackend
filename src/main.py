@@ -108,22 +108,44 @@ class TrafficMonitoringBackEnd:
                 ship_positions_list.append(doc)
             return ship_positions_list
 
+    def read_positions_with_id(port_id):
+        tile_id = myPorts.find({"id": port_id}
+                               , {"mapview_3": 1, "_id": 0})
+        tile_id_list = []
+        for doc in tile_id:
+            tile_id_list.append(doc)
+
+        mapview_tile = list(
+            myMapViews.find({"id": tile_id_list[0]["mapview_3"]},
+                            {"west": 1, "south": 1, "east": 1, "north": 1, "_id": 0}))
+        cardinal_directions = []
+        for doc in mapview_tile:
+            cardinal_directions.append(doc)
+        ship_positions = myCollection.find({"Position.coordinates.0": {"$gte": cardinal_directions[0]["south"],
+                                                                       "$lte": cardinal_directions[0]["north"]},
+                                            "Position.coordinates.1": {"$gte": cardinal_directions[0]["west"],
+                                                                       "$lte": cardinal_directions[0]["east"]}},
+                                           {"Position.coordinates": 1, "_id": 0})
+        ship_positions_list = []
+        for doc in ship_positions:
+            ship_positions_list.append(doc)
+        return ship_positions_list
+
     def get_tile_png(mapview_id):
-        x = myMapViews.find({"id": mapview_id})
-        y = [document["filename"] for document in x]
-        with open(y.pop(), "rb") as f:
-            png_encoded = base64.b64encode(f.read())
-            encoded_b2 = "".join([format(n, '08b') for n in png_encoded])
-        return encoded_b2
+        get_filename = myMapViews.find({"id": mapview_id}, {"_id": 0, "filename": 1})\
+            .sort('Timestamp', pymongo.DESCENDING)
+        filename = []
+        for doc in get_filename:
+            filename.append(doc)
+        to_binary = " ".join(format(ord(c), "b") for c in filename[0]["filename"])
+        return to_binary
 
 
 def main():
     x = TrafficMonitoringBackEnd
     vesselList = x.get_permanent_vessel_information(mmsi=235095435, imo=1000019, name="Lady K Ii")
-
     for i in vesselList:
         print(i)
-    print(x.get_tile_png(50383))
 
 
 if __name__ == '__main__':

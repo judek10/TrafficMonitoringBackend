@@ -81,6 +81,7 @@ class TestStringMethods(unittest.TestCase):
                            'un/locode': 'DKSTR', 'website': 'www.struerhavn.dk'}], result)
 
     def test_get_recent_vessel_positions(self):
+        # this is correct our ais data must be different, try to add unique ais message
         x = main.TrafficMonitoringBackEnd()
         recent_vessel_positions = x.get_recent_vessel_positions()
         positions = []
@@ -92,6 +93,8 @@ class TestStringMethods(unittest.TestCase):
                          positions)
 
     def test_get_recent_vessel_position_mmsi(self):
+        # this is correct on our ais
+        # try to insert a unique ais message, then search for that ais with mmsi
         x = main.TrafficMonitoringBackEnd
         recent_vessel_position = x.get_recent_vessel_position_mmsi(235090202)
         positions = []
@@ -128,11 +131,33 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue(ship_positions, message)
 
     def test_read_all_ship_positions(self):
-        x = main.TrafficMonitoringBackEnd
-        ship_positions = x.read_all_ship_positions("Struer", "Denmark")
+        tmb = main.TrafficMonitoringBackEnd
+        ship_positions = tmb.read_all_ship_positions("Struer", "Denmark")
         self.assertEqual([{'Position': {'coordinates': [56.493048, 8.598582]}}], ship_positions)
 
     def test_read_all_ship_positions_two(self):
-        x = main.TrafficMonitoringBackEnd
-        ship_positions = x.read_all_ship_positions("Flensburg", "Germany")
+        tmb = main.TrafficMonitoringBackEnd
+        ship_positions = tmb.read_all_ship_positions("Flensburg", "Germany")
         self.assertEqual([{'Position': {'coordinates': [54.814258, 9.454653]}}], ship_positions)
+
+    def test_read_positions_with_port_id(self):
+        tmb = main.TrafficMonitoringBackEnd
+        port = tmb.read_positions_with_id('2977')
+        self.assertEqual([{'Position': {'coordinates': [56.493048, 8.598582]}}], port)
+
+    def test_read_positions_with_port_id(self):
+        tmb = main.TrafficMonitoringBackEnd
+        port = tmb.read_positions_with_id('2968')
+        self.assertEqual([{'Position': {'coordinates': [56.073422, 10.817943]}}], port)
+
+    def test_get_png_to_binary(self):
+        tmb = main.TrafficMonitoringBackEnd
+        binary = tmb.get_tile_png(50371)
+        self.assertEqual('110011 111001 1000110 110111 110001 101110 1110000 1101110 1100111'
+                         , str(binary))
+
+    def test_get_png_to_binary(self):
+        tmb = main.TrafficMonitoringBackEnd
+        binary = tmb.get_tile_png(53333)
+        self.assertEqual('110100 110001 1000111 110000 110011 101110 1110000 1101110 1100111'
+                         , str(binary))

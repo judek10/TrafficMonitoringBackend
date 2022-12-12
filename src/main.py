@@ -72,11 +72,24 @@ class TrafficMonitoringBackEnd:
             myCollection.delete_many({"Timestamp": {"$lt": subtracted_current_time}}).deleted_count)
 
     def get_recent_vessel_positions(self):
+        """get permanent vessel information
+            searches for most recent vessel position reports and
+            retrieves the corresponding vessel documents for the position reports
+                                        :return: array of vessel documents
+                                        :rtype: array
+                                        """
         vessel_positions = myCollection.find({}, {"_id": 0, "MMSI": 1, "Position.coordinates": 1}) \
             .sort('Timestamp', pymongo.DESCENDING)
         return vessel_positions
 
     def get_recent_vessel_position_mmsi(mmsi):
+        """given an MMSI and optional IMO and name values, get permanent vessel information
+            searches for vessels with matching MMSI, imo, and name, then retrieves the corresponding vessel document
+                                :param mmsi, optional imo and/or name
+                                :type mmsi:int, imo:int, name:string
+                                :return: vessel object
+                                :rtype: vessel object
+                                """
         return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 1, "Position.coordinates": 1}) \
             .sort('Timestamp', pymongo.DESCENDING).limit(1)
 
@@ -108,6 +121,14 @@ class TrafficMonitoringBackEnd:
         return ports_list
 
     def get_permanent_vessel_information(mmsi, imo=None, name=None):
+        """given an MMSI and optional IMO and name values, get permanent vessel information
+
+                searches for vessels with matching MMSI, imo, and name, then retrieves the corresponding vessel document
+                        :param mmsi, optional imo and/or name
+                        :type mmsi:int, imo:int, name:string
+                        :return: vessel object
+                        :rtype: vessel object
+                        """
         if imo or name is not None:
             if imo is None:
                 return vessels.find({"MMSI": {"$eq": mmsi}, "Name": {"$eq": name}},
@@ -166,6 +187,14 @@ class TrafficMonitoringBackEnd:
             return ship_positions_list
 
     def get_recent_vessel_position_tile(tileId):
+        """given a tile id, get the recent vessel positions within the tile
+
+                searches for mapview tile with id, then retrieves the recent vessel positions inside the tile.
+                :param mapview_id:
+                :type mapview_id:
+                :return: array of ship documents
+                :rtype: array
+                """
         map_view_coordinates = myMapViews.find({"id": tileId}, {"_id": 0, "west": 1, "east": 1, "north": 1, "south": 1})
         ship_positions = myCollection.find({"Position.coordinates.0": {"$gte": map_view_coordinates[0]["south"],
                                                                        "$lte": map_view_coordinates[0]["north"]},
@@ -232,15 +261,16 @@ class TrafficMonitoringBackEnd:
         return last_vessel_positions
 
     def get_last_five_positions_mmsi(mmsi):
-        return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 5, "Position.coordinates": 5}) \
+        return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 1, "Position.coordinates": 1}) \
             .sort('Timestamp', pymongo.DESCENDING).limit(5)
 
 
 def main():
     x = TrafficMonitoringBackEnd
-    vessel_positions = x.get_recent_vessel_position_mmsi(235090202)
+    vessel_positions = x.get_recent_vessel_position_mmsi(235095435)
     for vessel in vessel_positions:
         print(vessel)
+    # print(vessel_positions[0])
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 [
-  {"Timestamp":"1999-11-18T13:15:00.000Z",
+  {"Timestamp":"1800-11-18T13:15:00.000Z",
   "Class":"Class A",
   "MMSI":244265000,
   "MsgType":"position_report",
@@ -11,7 +11,7 @@
   "CoG":62,
   "Heading":61},
 
-{"Timestamp":"1999-11-18T13:15:00.000Z",
+{"Timestamp":"1800-11-18T13:15:00.000Z",
   "Class":"Class A",
   "MMSI":220490000,"MsgType":"position_report",
   "Position":{"type":"Point",
@@ -22,7 +22,7 @@
   "CoG":12.2,
   "Heading":16},
 
-{"Timestamp":"1999-11-18T13:15:00.000Z",
+{"Timestamp":"1800-11-18T13:15:00.000Z",
   "Class":"Class A",
   "MMSI":210169000,
   "MsgType":"static_data",

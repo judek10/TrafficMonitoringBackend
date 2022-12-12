@@ -6,7 +6,7 @@ myClient = pymongo.MongoClient("mongodb://localhost:27017")
 myDataBase = myClient["AISTestData"]
 myCollection = myDataBase["aisdk_20201118"]
 
-test_timestamp_one = "1999-11-18 13:21:26.368387"
+test_timestamp_one = "1801-11-18 13:21:26.368387"
 test_timestamp_two = "2022-12-02 13:21:26.368387"
 test_timestamp_three = "1903-12-02 13:21:26.368387"
 
@@ -34,6 +34,18 @@ test_ais_two = {"Timestamp": "1902-11-18T00:02:00.000Z", "Class": "Class A", "MM
                 "Position": {"type": "Point", "coordinates": [55.522592, 15.068637]},
                 "Status": "Under way using engine",
                 "RoT": 2.2, "SoG": 14.8, "CoG": 62, "Heading": 61}
+
+test_ais_three = {"Timestamp": "2040-11-18T00:02:00.000Z", "Class": "Class A", "MMSI": 244265000,
+                  "MsgType": "position_report",
+                  "Position": {"type": "Point", "coordinates": [55.522592, 15.068637]},
+                  "Status": "Under way using engine",
+                  "RoT": 2.2, "SoG": 14.8, "CoG": 62, "Heading": 61}
+
+unique_ais = {"Timestamp": "1902-11-18T00:02:00.000Z", "Class": "Class A", "MMSI": 000000000,
+              "MsgType": "position_report",
+              "Position": {"type": "Point", "coordinates": [55.522592, 15.068637]},
+              "Status": "Under way using engine",
+              "RoT": 2.2, "SoG": 14.8, "CoG": 62, "Heading": 61}
 
 
 class TestStringMethods(unittest.TestCase):
@@ -89,17 +101,18 @@ class TestStringMethods(unittest.TestCase):
         positions = []
         for position in recent_vessel_positions:
             positions.append(position)
-        self.assertEqual({'MMSI': 375203000, 'Position': {'coordinates': [54.520033, 12.182773]}},
+        self.assertEqual({'MMSI': 244265000, 'Position': {'coordinates': [55.522592, 15.068637]}},
                          positions[0])
 
     def test_get_recent_vessel_position_mmsi(self):
         x = main.TrafficMonitoringBackEnd
-        recent_vessel_position = x.get_recent_vessel_position_mmsi(235090202)
+        x.insert_single_ais(unique_ais)
+        recent_vessel_position = x.get_recent_vessel_position_mmsi(000000000)
         positions = []
         for position in recent_vessel_position:
             positions.append(position)
         position = positions[0]
-        self.assertEqual({'MMSI': 235090202, 'Position': {'coordinates': [54.646827, 11.355255]}}, position)
+        self.assertEqual({'MMSI': 0, 'Position': {'coordinates': [55.522592, 15.068637]}}, position)
 
     def test_get_permanent_vessel_information_all_attributes(self):
         x = main.TrafficMonitoringBackEnd

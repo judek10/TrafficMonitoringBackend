@@ -40,7 +40,7 @@ class TrafficMonitoringBackEnd:
         return "Number of Insertions: " + str(insertion_number)
 
     def insert_single_ais(ais_data):
-        """inserts a AIS report (static data or position) into the collection.
+        """inserts an AIS report (static data or position) into the collection.
 
         param ais_data: a json formatted string that is to be inserted
         :type ais_data: str
@@ -175,9 +175,16 @@ class TrafficMonitoringBackEnd:
         return ship_positions
 
     def read_positions_with_id(port_id):
-        """
+        """read most recent positions of ships headed to port with port id
 
-        :return:
+        takes the parameter of port id to search for port, then takes the
+        mapview id to do another search that retrieves the tile size.
+        After retrieving the measurements a search is done to find all
+        positions within that area, and returned in an array
+        :param port_id:
+        :type port_id:
+        :return: array containing all the ship positions found within the searched port
+        :rtype: array
         """
         tile_id = myPorts.find({"id": port_id}
                                , {"mapview_3": 1, "_id": 0})

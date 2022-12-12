@@ -226,6 +226,15 @@ class TrafficMonitoringBackEnd:
         to_binary = " ".join(format(ord(c), "b") for c in filename[0]["filename"])
         return to_binary
 
+    def get_last_five_positions(self):
+        last_vessel_positions = myCollection.find({}, {"_id": 0, "MMSI": 5, "Position.coordinates": 5}) \
+            .sort('Timestamp', pymongo.DESCENDING).limit(7)
+        return last_vessel_positions
+
+    def get_last_five_positions_mmsi(mmsi):
+        return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 5, "Position.coordinates": 5}) \
+            .sort('Timestamp', pymongo.DESCENDING).limit(5)
+
 
 def main():
     x = TrafficMonitoringBackEnd

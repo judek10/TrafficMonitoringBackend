@@ -227,12 +227,12 @@ class TrafficMonitoringBackEnd:
         return to_binary
 
     def get_last_five_positions(self):
-        last_vessel_positions = myCollection.find({}, {"_id": 0, "MMSI": 5, "Position.coordinates": 5}) \
+        last_vessel_positions = myCollection.find({}, {"_id": 5, "MMSI": 5, "Position.coordinates": 5}) \
             .sort('Timestamp', pymongo.DESCENDING).limit(5)
         return last_vessel_positions
 
     def get_last_five_positions_mmsi(mmsi):
-        return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 5, "Position.coordinates": 5}) \
+        return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id": 5, "MMSI": 5, "Position.coordinates": 5}) \
             .sort('Timestamp', pymongo.DESCENDING).limit(5)
 
 

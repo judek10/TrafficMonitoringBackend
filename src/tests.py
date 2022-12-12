@@ -140,12 +140,7 @@ class TestStringMethods(unittest.TestCase):
     def test_read_positions_with_port_id(self):
         tmb = main.TrafficMonitoringBackEnd
         port = tmb.read_positions_with_id('2977')
-        self.assertEqual([{'Position': {'coordinates': [56.493048, 8.598582]}}], port)
-
-    def test_read_positions_with_port_id(self):
-        tmb = main.TrafficMonitoringBackEnd
-        port = tmb.read_positions_with_id('2968')
-        self.assertEqual([{'Position': {'coordinates': [56.073422, 10.817943]}}], port)
+        self.assertEqual([{'Position': {'coordinates': [56.493048, 8.598582]}}], port[0]['Position'])
 
     def test_get_png_to_binary(self):
         tmb = main.TrafficMonitoringBackEnd

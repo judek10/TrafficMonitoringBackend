@@ -73,7 +73,7 @@ class TrafficMonitoringBackEnd:
 
     def get_recent_vessel_positions(self):
         vessel_positions = myCollection.find({}, {"_id": 0, "MMSI": 1, "Position.coordinates": 1}) \
-            .sort('Timestamp', pymongo.DESCENDING).limit(3)
+            .sort('Timestamp', pymongo.DESCENDING)
         return vessel_positions
 
     def get_recent_vessel_position_mmsi(mmsi):
@@ -222,9 +222,9 @@ class TrafficMonitoringBackEnd:
 
 def main():
     x = TrafficMonitoringBackEnd
-    vesselList = x.get_permanent_vessel_information(mmsi=235095435, imo=1000019, name="Lady K Ii")
-    for i in vesselList:
-        print(i)
+    vessel_positions = x.get_recent_vessel_position_mmsi(235090202)
+    for vessel in vessel_positions:
+        print(vessel)
 
 
 if __name__ == '__main__':

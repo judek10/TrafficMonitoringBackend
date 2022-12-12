@@ -89,10 +89,8 @@ class TestStringMethods(unittest.TestCase):
         positions = []
         for position in recent_vessel_positions:
             positions.append(position)
-        self.assertEqual([{'MMSI': 235090202, 'Position': {'coordinates': [54.646827, 11.355255]}},
-                          {'MMSI': 266343000, 'Position': {'coordinates': [55.503335, 10.874448]}},
-                          {'MMSI': 375203000, 'Position': {'coordinates': [54.520033, 12.182773]}}],
-                         positions)
+        self.assertEqual({'MMSI': 375203000, 'Position': {'coordinates': [54.520033, 12.182773]}},
+                         positions[0])
 
     def test_get_recent_vessel_position_mmsi(self):
         x = main.TrafficMonitoringBackEnd

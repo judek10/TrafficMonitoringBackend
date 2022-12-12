@@ -108,6 +108,15 @@ class TrafficMonitoringBackEnd:
                 ship_positions_list.append(doc)
             return ship_positions_list
 
+    def get_recent_vessel_position_tile(tileId):
+        map_view_coordinates = myMapViews.find({"id": tileId}, {"_id": 0, "west": 1, "east": 1, "north": 1, "south": 1})
+        ship_positions = myCollection.find({"Position.coordinates.0": {"$gte": map_view_coordinates[0]["south"],
+                                                                       "$lte": map_view_coordinates[0]["north"]},
+                                            "Position.coordinates.1": {"$gte": map_view_coordinates[0]["west"],
+                                                                       "$lte": map_view_coordinates[0]["east"]}},
+                                           {"_id": 0, "Position.coordinates": 1, "MMSI": 1, "Name": 1, "IMO": 1})
+        return ship_positions
+
     def read_positions_with_id(port_id):
         tile_id = myPorts.find({"id": port_id}
                                , {"mapview_3": 1, "_id": 0})

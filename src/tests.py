@@ -158,3 +158,8 @@ class TestStringMethods(unittest.TestCase):
         binary = tmb.get_tile_png(53333)
         self.assertEqual('110100 110001 1000111 110000 110011 101110 1110000 1101110 1100111'
                          , str(binary))
+
+    def test_get_recent_vessel_position_tile(self):
+        x = main.TrafficMonitoringBackEnd
+        vessel_positions = x.get_recent_vessel_position_tile(5237)
+        self.assertEqual({'MMSI': 255805899, 'Position': {'coordinates': [57.478323, 9.329788]}}, vessel_positions[0])

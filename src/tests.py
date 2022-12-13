@@ -212,3 +212,12 @@ class TestStringMethods(unittest.TestCase):
                          {'MMSI': 257385000, 'Position': {'coordinates': [55.557392, 14.357867]}},
                          {'MMSI': 257385000, 'Position': {'coordinates': [57.757052, 10.965845]}},
                          {'MMSI': 257385000, 'Position': {'coordinates': [54.429803, 11.693033]}}, position)
+
+    def test_get_tiles_of_map_tile(self):
+        x = main.TrafficMonitoringBackEnd
+        mapview_docs = x.get_tiles_of_map_tile(5237)
+        self.assertEqual([
+            {'id': 52371, 'west': 9.0, 'south': 57.25, 'east': 9.5, 'north': 57.5, 'filename': '43F91.png'},
+            {'id': 52372, 'west': 9.5, 'south': 57.25, 'east': 10.0, 'north': 57.5, 'filename': '43F92.png'},
+            {'id': 52373, 'west': 9.0, 'south': 57.0, 'east': 9.5, 'north': 57.25, 'filename': '43F93.png'},
+            {'id': 52374, 'west': 9.5, 'south': 57.0, 'east': 10.0, 'north': 57.25, 'filename': '43F94.png'}], list(mapview_docs))

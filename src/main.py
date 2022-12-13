@@ -259,10 +259,20 @@ class TrafficMonitoringBackEnd:
         return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id": 5, "MMSI": 5, "Position.coordinates": 5}) \
             .sort('Timestamp', pymongo.DESCENDING).limit(5)
 
+    def get_tiles_of_map_tile(mapview_id):
+        """given a mapview id of zoom level 1, gets the 4 tiles contained in the mapview id's map tile
+                :param mapview_id:
+                :type mapview_id:
+                :return: array of mapview documents
+                :rtype: array
+                """
+        return myMapViews.find({"contained_by": mapview_id}, {"_id": 0, "id": 1, "west": 1, "south": 1,
+                                                              "east": 1, "north": 1, "filename": 1})
+
 
 def main():
     x = TrafficMonitoringBackEnd
-    vessel_positions = x.get_recent_vessel_position_mmsi(235090202)
+    vessel_positions = x.get_tiles_of_map_tile(5237)
     for vessel in vessel_positions:
         print(vessel)
 

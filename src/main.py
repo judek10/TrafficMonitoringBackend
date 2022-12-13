@@ -256,21 +256,20 @@ class TrafficMonitoringBackEnd:
         return to_binary
 
     def get_last_five_positions(self):
-        last_vessel_positions = myCollection.find({}, {"_id": 0, "MMSI": 5, "Position.coordinates": 5}) \
+        last_vessel_positions = myCollection.find({}, {"_id": 5, "MMSI": 5, "Position.coordinates": 5}) \
             .sort('Timestamp', pymongo.DESCENDING).limit(5)
         return last_vessel_positions
 
     def get_last_five_positions_mmsi(mmsi):
-        return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 1, "Position.coordinates": 1}) \
+        return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id": 5, "MMSI": 5, "Position.coordinates": 5}) \
             .sort('Timestamp', pymongo.DESCENDING).limit(5)
 
 
 def main():
     x = TrafficMonitoringBackEnd
-    vessel_positions = x.get_recent_vessel_position_mmsi(235095435)
+    vessel_positions = x.get_recent_vessel_position_mmsi(235090202)
     for vessel in vessel_positions:
         print(vessel)
-    # print(vessel_positions[0])
 
 
 if __name__ == '__main__':

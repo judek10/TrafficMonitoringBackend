@@ -311,10 +311,6 @@ class TrafficMonitoringBackEnd:
         for doc in tile_id:
             tile_id_list.append(doc)
 
-        tile_id_list = []
-        for doc in tile_id:
-            tile_id_list.append(doc)
-
         if not tile_id_list or tile_id_list[0]["mapview_3"] is None:
             port_documents = myPorts.find({}, {"_id": 0, "un/locode": 0, "website": 0})
             ports_list = []

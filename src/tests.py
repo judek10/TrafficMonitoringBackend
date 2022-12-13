@@ -45,31 +45,7 @@ unique_ais = {"Timestamp": "1902-11-18T00:02:00.000Z", "Class": "Class A", "MMSI
               "MsgType": "position_report",
               "Position": {"type": "Point", "coordinates": [55.522592, 15.068637]},
               "Status": "Under way using engine",
-              "RoT": 2.2, "SoG": 14.8, "CoG": 62, "Heading": 61},\
-             {"Timestamp": "2020-11-18T00:00:00.000Z", "Class": "Class A", "MMSI": 000000000,
-              "MsgType": "position_report",
-              "Position": {"type": "Point", "coordinates": [55.219403, 13.127725]},
-              "Status": "Under way using engine",
-              "RoT": 25.7, "SoG": 12.3, "CoG": 96.5, "Heading": 101},\
-             {"Timestamp": "2020-11-18T00:00:01.000Z", "Class": "Class A", "MMSI": 000000000,
-              "MsgType": "position_report",
-              "Position": {"type": "Point", "coordinates": [54.933897, 10.833697]},
-              "Status": "Under way using engine",
-              "RoT": 0, "SoG": 0, "CoG": 335.8, "Heading": 297},\
-             {"Timestamp": "2020-11-18T00:00:01.000Z", "Class": "Class A", "MMSI": 000000000,
-              "MsgType": "position_report",
-              "Position": {"type": "Point", "coordinates": [55.557392, 14.357867]},
-              "Status": "Engaged in fishing",
-              "RoT": 0, "SoG": 0, "CoG": 33, "Heading": 107},\
-             {"Timestamp": "2020-11-18T00:00:03.000Z", "Class": "Class A", "MMSI": 000000000,
-              "MsgType": "position_report",
-              "Position": {"type": "Point", "coordinates": [57.757052, 10.965845]},
-              "Status": "Under way using engine",
-              "RoT": 0, "SoG": 9.9, "CoG": 117.3, "Heading": 121},\
-             {"Timestamp": "2020-11-18T00:00:03.000Z", "Class": "Class A", "MMSI": 000000000,
-              "MsgType": "position_report",
-              "Position": {"type": "Point", "coordinates": [54.429803, 11.693033]}, "Status": "Under way using engine",
-              "RoT": 0, "SoG": 12.6, "CoG": 114.8, "Heading": 116}
+              "RoT": 2.2, "SoG": 14.8, "CoG": 62, "Heading": 61}
 
 
 class TestStringMethods(unittest.TestCase):
@@ -225,17 +201,16 @@ class TestStringMethods(unittest.TestCase):
 
     def test_get_last_five_positions_mmsi(self):
         x = main.TrafficMonitoringBackEnd
-        x.insert_single_ais(unique_ais)
-        recent_vessel_position = x.get_last_five_positions_mmsi(000000000)
+        x.insert_batch_of_ais("AISMessages3.json")
+        recent_vessel_position = x.get_last_five_positions_mmsi(232323237)
         positions = []
         for position in recent_vessel_position:
             positions.append(position)
-        position = positions[4]
-        self.assertEqual([{'MMSI': 0, 'Position': {'coordinates': [55.219403, 13.127725]}},
-                          {'MMSI': 0, 'Position': {'coordinates': [54.933897, 10.833697]}},
-                          {'MMSI': 0, 'Position': {'coordinates': [55.557392, 14.357867]}},
-                          {'MMSI': 0, 'Position': {'coordinates': [57.757052, 10.965845]}},
-                          {'MMSI': 0, 'Position': {'coordinates': [54.429803, 11.693033]}}], position)
+        self.assertEqual([{'MMSI': 232323237, 'Position': {'coordinates': [55.60658, 8.022727]}},
+                          {'MMSI': 232323237, 'Position': {'coordinates': [54.60613, 7.088777]}},
+                          {'MMSI': 232323237, 'Position': {'coordinates': [55.522592, 15.062222]}},
+                          {'MMSI': 232323237, 'Position': {'coordinates': [55.522592, 15.068637]}},
+                          {'MMSI': 232323237, 'Position': {'coordinates': [56.60658, 7.088727]}}], list(positions))
 
     def test_get_tiles_of_map_tile(self):
         x = main.TrafficMonitoringBackEnd
@@ -244,7 +219,8 @@ class TestStringMethods(unittest.TestCase):
             {'id': 52371, 'west': 9.0, 'south': 57.25, 'east': 9.5, 'north': 57.5, 'filename': '43F91.png'},
             {'id': 52372, 'west': 9.5, 'south': 57.25, 'east': 10.0, 'north': 57.5, 'filename': '43F92.png'},
             {'id': 52373, 'west': 9.0, 'south': 57.0, 'east': 9.5, 'north': 57.25, 'filename': '43F93.png'},
-            {'id': 52374, 'west': 9.5, 'south': 57.0, 'east': 10.0, 'north': 57.25, 'filename': '43F94.png'}], list(mapview_docs))
+            {'id': 52374, 'west': 9.5, 'south': 57.0, 'east': 10.0, 'north': 57.25, 'filename': '43F94.png'}],
+            list(mapview_docs))
 
     def test_get_tiles_of_map_tile_invalid_data_type(self):
         x = main.TrafficMonitoringBackEnd

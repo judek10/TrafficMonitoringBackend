@@ -24,7 +24,7 @@ class TrafficMonitoringBackEnd:
         """takes a batch of AIS data (json file) and inserts this data into mongoDB
 
         param ais_data: file object that stores the to be inserted AIS data
-        :type ais_data: file object
+        :type ais_data: json file
         :return: the number of documents inserted into the collection
         :rtype: str
         """

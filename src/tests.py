@@ -45,33 +45,31 @@ unique_ais = {"Timestamp": "1902-11-18T00:02:00.000Z", "Class": "Class A", "MMSI
               "MsgType": "position_report",
               "Position": {"type": "Point", "coordinates": [55.522592, 15.068637]},
               "Status": "Under way using engine",
-              "RoT": 2.2, "SoG": 14.8, "CoG": 62, "Heading": 61}
-
-test_last_five = [
-    {"Timestamp": "2020-11-18T00:00:00.000Z", "Class": "Class A", "MMSI": 257385000, "MsgType": "position_report",
-     "Position": {"type": "Point", "coordinates": [55.219403, 13.127725]}, "Status": "Under way using engine",
-     "RoT": 25.7, "SoG": 12.3, "CoG": 96.5, "Heading": 101},
-    {"Timestamp": "2020-11-18T00:00:01.000Z", "Class": "Class A", "MMSI": 219023834, "MsgType": "position_report",
-     "Position": {"type": "Point", "coordinates": [54.933897, 10.833697]}, "Status": "Under way using engine",
-     "RoT": 0, "SoG": 0, "CoG": 335.8, "Heading": 297},
-    {"Timestamp": "2020-11-18T00:00:01.000Z", "Class": "Class A", "MMSI": 265750000, "MsgType": "position_report",
-     "Position": {"type": "Point", "coordinates": [55.557392, 14.357867]}, "Status": "Engaged in fishing",
-     "RoT": 0, "SoG": 0, "CoG": 33, "Heading": 107},
-    {"Timestamp": "2020-11-18T00:00:03.000Z", "Class": "Class A", "MMSI": 236213000, "MsgType": "position_report",
-     "Position": {"type": "Point", "coordinates": [57.757052, 10.965845]}, "Status": "Under way using engine",
-     "RoT": 0, "SoG": 9.9, "CoG": 117.3, "Heading": 121},
-    {"Timestamp": "2020-11-18T00:00:03.000Z", "Class": "Class A", "MMSI": 209664000, "MsgType": "position_report",
-     "Position": {"type": "Point", "coordinates": [54.429803, 11.693033]}, "Status": "Under way using engine",
-     "RoT": 0, "SoG": 12.6, "CoG": 114.8, "Heading": 116},
-    {"Timestamp": "2020-11-18T00:00:03.000Z", "Class": "Class A", "MMSI": 250000962, "MsgType": "position_report",
-     "Position": {"type": "Point", "coordinates": [57.8193, 9.260667]}, "Status": "Under way using engine",
-     "RoT": -12.9, "SoG": 8.2, "CoG": 264.6, "Heading": 260},
-    {"Timestamp": "2020-11-18T00:00:04.000Z", "Class": "Class A", "MMSI": 220614000, "MsgType": "position_report",
-     "Position": {"type": "Point", "coordinates": [57.70312, 10.659543]}, "Status": "Under way using engine",
-     "RoT": -3.6, "SoG": 0.1, "CoG": 225, "Heading": 235},
-    {"Timestamp": "2020-11-18T00:00:04.000Z", "Class": "Class A", "MMSI": 219000762, "MsgType": "position_report",
-     "Position": {"type": "Point", "coordinates": [55.911902, 10.25898]}, "Status": "Under way using engine",
-     "RoT": 0, "SoG": 0, "CoG": 336, "Heading": 64}]
+              "RoT": 2.2, "SoG": 14.8, "CoG": 62, "Heading": 61},\
+             {"Timestamp": "2020-11-18T00:00:00.000Z", "Class": "Class A", "MMSI": 000000000,
+              "MsgType": "position_report",
+              "Position": {"type": "Point", "coordinates": [55.219403, 13.127725]},
+              "Status": "Under way using engine",
+              "RoT": 25.7, "SoG": 12.3, "CoG": 96.5, "Heading": 101},\
+             {"Timestamp": "2020-11-18T00:00:01.000Z", "Class": "Class A", "MMSI": 000000000,
+              "MsgType": "position_report",
+              "Position": {"type": "Point", "coordinates": [54.933897, 10.833697]},
+              "Status": "Under way using engine",
+              "RoT": 0, "SoG": 0, "CoG": 335.8, "Heading": 297},\
+             {"Timestamp": "2020-11-18T00:00:01.000Z", "Class": "Class A", "MMSI": 000000000,
+              "MsgType": "position_report",
+              "Position": {"type": "Point", "coordinates": [55.557392, 14.357867]},
+              "Status": "Engaged in fishing",
+              "RoT": 0, "SoG": 0, "CoG": 33, "Heading": 107},\
+             {"Timestamp": "2020-11-18T00:00:03.000Z", "Class": "Class A", "MMSI": 000000000,
+              "MsgType": "position_report",
+              "Position": {"type": "Point", "coordinates": [57.757052, 10.965845]},
+              "Status": "Under way using engine",
+              "RoT": 0, "SoG": 9.9, "CoG": 117.3, "Heading": 121},\
+             {"Timestamp": "2020-11-18T00:00:03.000Z", "Class": "Class A", "MMSI": 000000000,
+              "MsgType": "position_report",
+              "Position": {"type": "Point", "coordinates": [54.429803, 11.693033]}, "Status": "Under way using engine",
+              "RoT": 0, "SoG": 12.6, "CoG": 114.8, "Heading": 116}
 
 
 class TestStringMethods(unittest.TestCase):
@@ -228,16 +226,16 @@ class TestStringMethods(unittest.TestCase):
     def test_get_last_five_positions_mmsi(self):
         x = main.TrafficMonitoringBackEnd
         x.insert_single_ais(unique_ais)
-        last_five_positions = x.get_last_five_positions_mmsi(257385000)
-        five_positions = []
-        for position in last_five_positions:
-            five_positions.append(position)
-        position = five_positions[5]
-        self.assertEqual({'MMSI': 257385000, 'Position': {'coordinates': [55.219403, 13.127725]}},
-                         {'MMSI': 257385000, 'Position': {'coordinates': [54.933897, 10.833697]}},
-                         {'MMSI': 257385000, 'Position': {'coordinates': [55.557392, 14.357867]}},
-                         {'MMSI': 257385000, 'Position': {'coordinates': [57.757052, 10.965845]}},
-                         {'MMSI': 257385000, 'Position': {'coordinates': [54.429803, 11.693033]}}, position)
+        recent_vessel_position = x.get_last_five_positions_mmsi(000000000)
+        positions = []
+        for position in recent_vessel_position:
+            positions.append(position)
+        position = positions[4]
+        self.assertEqual([{'MMSI': 0, 'Position': {'coordinates': [55.219403, 13.127725]}},
+                          {'MMSI': 0, 'Position': {'coordinates': [54.933897, 10.833697]}},
+                          {'MMSI': 0, 'Position': {'coordinates': [55.557392, 14.357867]}},
+                          {'MMSI': 0, 'Position': {'coordinates': [57.757052, 10.965845]}},
+                          {'MMSI': 0, 'Position': {'coordinates': [54.429803, 11.693033]}}], position)
 
     def test_get_tiles_of_map_tile(self):
         x = main.TrafficMonitoringBackEnd

@@ -279,7 +279,14 @@ class TrafficMonitoringBackEnd:
         return to_binary
 
     def get_last_five_positions_mmsi(mmsi):
-        return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id": 5, "MMSI": 5, "Position.coordinates": 5}) \
+        """given an MMSI and optional IMO and name values, get permanent vessel information
+            searches for vessels with matching MMSI, imo, and name, then retrieves the corresponding vessel document
+                                :param mmsi, optional imo or name
+                                :type mmsi:int, imo:int, name:string
+                                :return: vessel object
+                                :rtype: vessel object
+                                """
+        return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 1, "Position.coordinates": 1}) \
             .sort('Timestamp', pymongo.DESCENDING).limit(5)
 
     def get_tiles_of_map_tile(mapview_id):

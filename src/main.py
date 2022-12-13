@@ -304,6 +304,18 @@ class TrafficMonitoringBackEnd:
             raise TypeError("mapview_id must be an integer")
 
     def read_positions_with_port_name(port_name, country):
+        """read the recent positions of ships headed to port with port name and country
+        takes the port name and country to find port,
+        takes the mapview id to search again for the tile size,
+        and return all ship positions within that given area and return it in
+        an array in position documents form.
+            param port_name: the port name
+            :type port_name: str
+            :param country: country of port
+            :type country: str
+            :return: array with all the ship positions found within the given port
+            :rtype: array
+            """
 
         tile_id = myPorts.find({"port_location": port_name, "country": country}, {"mapview_3": 1, "_id": 0})
 

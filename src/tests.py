@@ -140,10 +140,31 @@ class TestStringMethods(unittest.TestCase):
         position = positions[0]
         self.assertEqual({'MMSI': 0, 'Position': {'coordinates': [55.522592, 15.068637]}}, position)
 
+    def test_get_recent_vessel_position_mmsi_invalid_data_type(self):
+        x = main.TrafficMonitoringBackEnd
+        x.insert_single_ais(unique_ais)
+        with self.assertRaises(TypeError):
+            x.get_permanent_vessel_information("000000000")
+
     def test_get_permanent_vessel_information_all_attributes(self):
         x = main.TrafficMonitoringBackEnd
         vessels = x.get_permanent_vessel_information(mmsi=235095435, imo=1000019, name="Lady K Ii")
         self.assertEqual({'IMO': 1000019, 'Name': 'Lady K Ii', 'MMSI': 235095435}, vessels[0])
+
+    def test_get_permanent_vessel_information_all_attributes_invalid_mmsi_data_type(self):
+        x = main.TrafficMonitoringBackEnd
+        with self.assertRaises(TypeError):
+            x.get_permanent_vessel_information(mmsi="235095435", imo=1000019, name="Lady K Ii")
+
+    def test_get_permanent_vessel_information_all_attributes_invalid_imo_data_type(self):
+        x = main.TrafficMonitoringBackEnd
+        with self.assertRaises(TypeError):
+            x.get_permanent_vessel_information(mmsi=235095435, imo="1000019", name="Lady K Ii")
+
+    def test_get_permanent_vessel_information_all_attributes_invalid_name_data_type(self):
+        x = main.TrafficMonitoringBackEnd
+        with self.assertRaises(TypeError):
+            x.get_permanent_vessel_information(mmsi=235095435, imo="1000019", name=["Lady K Ii"])
 
     def test_get_permanent_vessel_information_imo_mmsi(self):
         x = main.TrafficMonitoringBackEnd
@@ -199,6 +220,11 @@ class TestStringMethods(unittest.TestCase):
         vessel_positions = x.get_recent_vessel_position_tile(5237)
         self.assertEqual({'MMSI': 255805899, 'Position': {'coordinates': [57.478323, 9.329788]}}, vessel_positions[0])
 
+    def test_get_recent_vessel_position_tile_invalid_data_type(self):
+        x = main.TrafficMonitoringBackEnd
+        with self.assertRaises(TypeError):
+            x.get_recent_vessel_position_tile("5237")
+
     def test_get_last_five_positions_mmsi(self):
         x = main.TrafficMonitoringBackEnd
         x.insert_single_ais(unique_ais)
@@ -221,3 +247,8 @@ class TestStringMethods(unittest.TestCase):
             {'id': 52372, 'west': 9.5, 'south': 57.25, 'east': 10.0, 'north': 57.5, 'filename': '43F92.png'},
             {'id': 52373, 'west': 9.0, 'south': 57.0, 'east': 9.5, 'north': 57.25, 'filename': '43F93.png'},
             {'id': 52374, 'west': 9.5, 'south': 57.0, 'east': 10.0, 'north': 57.25, 'filename': '43F94.png'}], list(mapview_docs))
+
+    def test_get_tiles_of_map_tile_invalid_data_type(self):
+        x = main.TrafficMonitoringBackEnd
+        with self.assertRaises(TypeError):
+            x.get_tiles_of_map_tile("5237")

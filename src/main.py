@@ -72,7 +72,7 @@ class TrafficMonitoringBackEnd:
             myCollection.delete_many({"Timestamp": {"$lt": subtracted_current_time}}).deleted_count)
 
     def get_recent_vessel_positions(self):
-        """get permanent vessel information
+        """get recent vessel information
             searches for most recent vessel position reports and
             retrieves the corresponding vessel documents for the position reports
                                         :return: array of vessel documents
@@ -90,8 +90,11 @@ class TrafficMonitoringBackEnd:
                                 :return: vessel object
                                 :rtype: vessel object
                                 """
-        return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 1, "Position.coordinates": 1}) \
-            .sort('Timestamp', pymongo.DESCENDING).limit(1)
+        if isinstance(mmsi, int):
+            return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 1, "Position.coordinates": 1}) \
+                .sort('Timestamp', pymongo.DESCENDING).limit(1)
+        else:
+            raise TypeError('MMSI must be an integer')
 
     def find_all_ports(port_name, country=None):
         """finds all ports with the given param: port_name and country(optional).
@@ -129,18 +132,34 @@ class TrafficMonitoringBackEnd:
                         :return: vessel object
                         :rtype: vessel object
                         """
-        if imo or name is not None:
-            if imo is None:
-                return vessels.find({"MMSI": {"$eq": mmsi}, "Name": {"$eq": name}},
-                                    {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
-            elif name is None:
-                return vessels.find({"MMSI": {"$eq": mmsi}, "IMO": {"$eq": imo}},
-                                    {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
+        if isinstance(mmsi, int):
+            if imo or name is not None:
+                if imo is None:
+                    if isinstance(name, str):
+                        return vessels.find({"MMSI": {"$eq": mmsi}, "Name": {"$eq": name}},
+                                            {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
+                    else:
+                        raise TypeError('name must be a string')
+
+                elif name is None:
+                    if isinstance(imo, int):
+                        return vessels.find({"MMSI": {"$eq": mmsi}, "IMO": {"$eq": imo}},
+                                            {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
+                    else:
+                        raise TypeError('imo must be an int')
+                else:
+                    if isinstance(imo, int) and isinstance(name, str):
+                        return vessels.find({"MMSI": {"$eq": mmsi}, "IMO": {"$eq": imo}, "Name": {"$eq": name}},
+                                            {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
+                    else:
+                        raise TypeError('incorrect datatype(s)')
             else:
-                return vessels.find({"MMSI": {"$eq": mmsi}, "IMO": {"$eq": imo}, "Name": {"$eq": name}},
-                                    {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
+                return vessels.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
         else:
-            return vessels.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 1, "Name": 1, "IMO": 1})
+            raise TypeError('MMSI must be an integer')
+
+
+
 
     def read_all_ship_positions(port_name, country):
         """read all ship positions in the tile of scale 3 containing given port
@@ -195,13 +214,17 @@ class TrafficMonitoringBackEnd:
                 :return: array of ship documents
                 :rtype: array
                 """
-        map_view_coordinates = myMapViews.find({"id": tileId}, {"_id": 0, "west": 1, "east": 1, "north": 1, "south": 1})
-        ship_positions = myCollection.find({"Position.coordinates.0": {"$gte": map_view_coordinates[0]["south"],
-                                                                       "$lte": map_view_coordinates[0]["north"]},
-                                            "Position.coordinates.1": {"$gte": map_view_coordinates[0]["west"],
-                                                                       "$lte": map_view_coordinates[0]["east"]}},
-                                           {"_id": 0, "Position.coordinates": 1, "MMSI": 1, "Name": 1, "IMO": 1})
-        return ship_positions
+        if isinstance(tileId, int):
+            map_view_coordinates = myMapViews.find({"id": tileId},
+                                                   {"_id": 0, "west": 1, "east": 1, "north": 1, "south": 1})
+            ship_positions = myCollection.find({"Position.coordinates.0": {"$gte": map_view_coordinates[0]["south"],
+                                                                           "$lte": map_view_coordinates[0]["north"]},
+                                                "Position.coordinates.1": {"$gte": map_view_coordinates[0]["west"],
+                                                                           "$lte": map_view_coordinates[0]["east"]}},
+                                               {"_id": 0, "Position.coordinates": 1, "MMSI": 1, "Name": 1, "IMO": 1})
+            return ship_positions
+        else:
+            raise TypeError('tileId must be an integer')
 
     def read_positions_with_id(port_id):
         """read most recent positions of ships headed to port with port id
@@ -266,8 +289,11 @@ class TrafficMonitoringBackEnd:
                 :return: array of mapview documents
                 :rtype: array
                 """
-        return myMapViews.find({"contained_by": mapview_id}, {"_id": 0, "id": 1, "west": 1, "south": 1,
+        if isinstance(mapview_id, int):
+            return myMapViews.find({"contained_by": mapview_id}, {"_id": 0, "id": 1, "west": 1, "south": 1,
                                                               "east": 1, "north": 1, "filename": 1})
+        else:
+            raise TypeError("mapview_id must be an integer")
 
 
 def main():

@@ -199,15 +199,6 @@ class TestStringMethods(unittest.TestCase):
         vessel_positions = x.get_recent_vessel_position_tile(5237)
         self.assertEqual({'MMSI': 255805899, 'Position': {'coordinates': [57.478323, 9.329788]}}, vessel_positions[0])
 
-    def test_get_last_five_positions(self):
-        x = main.TrafficMonitoringBackEnd()
-        last_five_positions = x.get_last_five_positions()
-        five_positions = []
-        for position in last_five_positions:
-            five_positions.append(position)
-        self.assertEqual([{'MMSI': 257385000, 'Position': {'coordinates': [55.219403, 13.127725]}}],
-                         five_positions[5])
-
     def test_get_last_five_positions_mmsi(self):
         x = main.TrafficMonitoringBackEnd
         x.insert_single_ais(unique_ais)
@@ -215,7 +206,7 @@ class TestStringMethods(unittest.TestCase):
         five_positions = []
         for position in last_five_positions:
             five_positions.append(position)
-        position = five_positions[4]
+        position = five_positions[5]
         self.assertEqual({'MMSI': 257385000, 'Position': {'coordinates': [55.219403, 13.127725]}},
                          {'MMSI': 257385000, 'Position': {'coordinates': [54.933897, 10.833697]}},
                          {'MMSI': 257385000, 'Position': {'coordinates': [55.557392, 14.357867]}},

@@ -226,3 +226,8 @@ class TestStringMethods(unittest.TestCase):
         x = main.TrafficMonitoringBackEnd
         with self.assertRaises(TypeError):
             x.get_tiles_of_map_tile("5237")
+
+    def test_read_positions_with_port_name(self):
+        tmb = main.TrafficMonitoringBackEnd
+        ship_positions = tmb.read_positions_with_port_name("Struer", "Denmark")
+        self.assertEqual({'coordinates': [56.493048, 8.598582]}, ship_positions[0]['Position'])

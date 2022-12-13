@@ -279,13 +279,14 @@ class TrafficMonitoringBackEnd:
         return to_binary
 
     def get_last_five_positions_mmsi(mmsi):
-        """given an MMSI and optional IMO and name values, get permanent vessel information
-            searches for vessels with matching MMSI, imo, and name, then retrieves the corresponding vessel document
-                                :param mmsi, optional imo or name
-                                :type mmsi:int, imo:int, name:string
-                                :return: vessel object
-                                :rtype: vessel object
-                                """
+        """given an MMSI and or IMO/name values, it will get the permanent vessel information and
+            searches for vessels with matching MMSI, imo/name, then gets the corresponding vessel document of
+            the coordinates and the last five positions of the vessel
+            :param mmsi, optional imo or name
+            :type mmsi:int, imo:int, name:string
+            :return: vessel object
+            :rtype: vessel object
+            """
         return myCollection.find({"MMSI": {"$eq": mmsi}}, {"_id": 0, "MMSI": 1, "Position.coordinates": 1}) \
             .sort('Timestamp', pymongo.DESCENDING).limit(5)
 
@@ -302,6 +303,41 @@ class TrafficMonitoringBackEnd:
         else:
             raise TypeError("mapview_id must be an integer")
 
+    def read_positions_with_port_name(port_name, country):
+
+        tile_id = myPorts.find({"port_location": port_name, "country": country}, {"mapview_3": 1, "_id": 0})
+
+        tile_id_list = []
+        for doc in tile_id:
+            tile_id_list.append(doc)
+
+        tile_id_list = []
+        for doc in tile_id:
+            tile_id_list.append(doc)
+
+        if not tile_id_list or tile_id_list[0]["mapview_3"] is None:
+            port_documents = myPorts.find({}, {"_id": 0, "un/locode": 0, "website": 0})
+            ports_list = []
+            for doc in port_documents:
+                ports_list.append(doc)
+            return ports_list
+        else:
+            mapview_tile = list(
+                myMapViews.find({"id": tile_id_list[0]["mapview_3"]},
+                                {"west": 1, "south": 1, "east": 1, "north": 1, "_id": 0}))
+
+        cardinal_directions = []
+        for doc in mapview_tile:
+            cardinal_directions.append(doc)
+        ship_positions = myCollection.find({"Position.coordinates.0": {"$gte": cardinal_directions[0]["south"],
+                                                                       "$lte": cardinal_directions[0]["north"]},
+                                            "Position.coordinates.1": {"$gte": cardinal_directions[0]["west"],
+                                                                       "$lte": cardinal_directions[0]["east"]}},
+                                           {"Position.coordinates": 1, "_id": 0})
+        ship_positions_list = []
+        for doc in ship_positions:
+            ship_positions_list.append(doc)
+        return ship_positions_list
 
 def main():
     x = TrafficMonitoringBackEnd
